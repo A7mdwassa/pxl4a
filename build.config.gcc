@@ -1,7 +1,7 @@
-KERNEL_DIR=private/msm-google
+KERNEL_DIR=.
 . ${ROOT_DIR}/${KERNEL_DIR}/build.config.common
 KCFLAGS='-fno-tree-vrp'
-POST_DEFCONFIG_CMDS="check_defconfig && update_gcc_config"
+POST_DEFCONFIG_CMDS="update_gcc_config"
 
 function update_gcc_config() {
   # Disable clang-specific options

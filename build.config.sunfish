@@ -1,6 +1,2 @@
-KERNEL_DIR=private/msm-google
+KERNEL_DIR=.
 . ${ROOT_DIR}/${KERNEL_DIR}/build.config.sunfish.common.clang
-POST_DEFCONFIG_CMDS="check_defconfig"
-UNSTRIPPED_MODULES="
-wlan.ko
-"

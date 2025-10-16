@@ -1,0 +1,12 @@
+0001-BACKPORT-fs-implement-SUSFS-v1.5.9.patch
+0001-fs-susfs-merge-and-cherry-pick-commits-from-susfs-v1.patch
+0001-fs-susfs-Make-sus_mounts-invisible-only-for-apps-tha.patch
+0001-security-avc-susfs-Temp-fix-for-avc-log-message-bein.patch
+0001-susfs-Revert-renaming-symbols-in-KernelSU-driver.patch
+0001-susfs-Bump-version-to-v1.5.10-latest.patch
+0001-BACKPORT-seccomp-add-filter_count-field-for-KernelSU.patch
+manual_hooks_1.5.patch
+0001-fix-ISO-C99-error.patch
+0001-fix-undefined-susfs-errors.patch
+0001-replace-susfs_set_current_non_root_user_app_proc-wit.patch
+0001-fix-susfs_reorder_mnt_id.patch
