@@ -334,6 +334,8 @@ static struct mount *susfs_alloc_sus_vfsmnt(const char *name)
 		// Make sure mnt->mnt.susfs_mnt_id_backup is initialized every time.
 		mnt->mnt.susfs_mnt_id_backup = 0;
 
+		mnt->mnt.data = NULL;
+
 		INIT_HLIST_NODE(&mnt->mnt_hash);
 		INIT_LIST_HEAD(&mnt->mnt_child);
 		INIT_LIST_HEAD(&mnt->mnt_mounts);
@@ -344,7 +346,7 @@ static struct mount *susfs_alloc_sus_vfsmnt(const char *name)
 		INIT_LIST_HEAD(&mnt->mnt_slave);
 		INIT_HLIST_NODE(&mnt->mnt_mp_list);
 		INIT_LIST_HEAD(&mnt->mnt_umounting);
-		INIT_HLIST_HEAD(&mnt->mnt_stuck_children);
+		init_fs_pin(&mnt->mnt_umount, drop_mountpoint);
 	}
 	return mnt;
 
