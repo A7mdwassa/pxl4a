@@ -38,8 +38,8 @@
 extern bool susfs_is_current_ksu_domain(void);
 extern bool susfs_is_current_zygote_domain(void);
 
-static DEFINE_IDA(susfs_mnt_id_ida);
-static DEFINE_IDA(susfs_mnt_group_ida);
+static DEFINE_IDA(susfs_ksu_mnt_id_ida);
+static DEFINE_IDA(susfs_ksu_mnt_group_ida);
 static int susfs_mnt_id_start = DEFAULT_SUS_MNT_ID;
 static int susfs_mnt_group_start = DEFAULT_SUS_MNT_GROUP_ID;
 
@@ -130,15 +130,15 @@ static inline struct hlist_head *mp_hash(struct dentry *dentry)
 }
 
 #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
-// Our own mnt_alloc_id() that assigns mnt_id starting from DEFAULT_SUS_MNT_ID
+/* Used to allocate fake mnt_id */
 static int susfs_mnt_alloc_id(struct mount *mnt)
 {
 	int res;
 
 retry:
-	ida_pre_get(&susfs_mnt_id_ida, GFP_KERNEL);
+	ida_pre_get(&susfs_ksu_mnt_id_ida, GFP_KERNEL);
 	spin_lock(&mnt_id_lock);
-	res = ida_get_new_above(&susfs_mnt_id_ida, susfs_mnt_id_start, &mnt->mnt_id);
+	res = ida_get_new_above(&susfs_ksu_mnt_id_ida, susfs_mnt_id_start, &mnt->mnt_id);
 	if (!res)
 		susfs_mnt_id_start = mnt->mnt_id + 1;
 	spin_unlock(&mnt_id_lock);
@@ -176,7 +176,7 @@ static void mnt_free_id(struct mount *mnt)
 		return;
 	}
 	// Now we can check if its mnt_id is sus
-	if (unlikely(mnt->mnt_id >= DEFAULT_SUS_MNT_ID)) {
+	if (unlikely(mnt->mnt_id >= DEFAULT_KSU_MNT_ID)) {
 		spin_lock(&mnt_id_lock);
 		ida_remove(&susfs_mnt_id_ida, id);
 		if (susfs_mnt_id_start > id)
@@ -214,11 +214,11 @@ static int mnt_alloc_group_id(struct mount *mnt)
 	int res;
 
 #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
-	if (mnt->mnt_id >= DEFAULT_SUS_MNT_ID) {
-		if (!ida_pre_get(&susfs_mnt_group_ida, GFP_KERNEL))
+	if (mnt->mnt_id >= DEFAULT_KSU_MNT_ID) {
+		if (!ida_pre_get(&susfs_ksu_mnt_group_ida, GFP_KERNEL))
 			return -ENOMEM;
-		// If so, assign a sus mnt_group id DEFAULT_SUS_MNT_GROUP_ID from susfs_mnt_group_ida
-		res = ida_get_new_above(&susfs_mnt_group_ida,
+		// If so, assign a sus mnt_group id DEFAULT_SUS_MNT_GROUP_ID from susfs_ksu_mnt_group_ida
+		res = ida_get_new_above(&susfs_ksu_mnt_group_ida,
 					susfs_mnt_group_start,
 					&mnt->mnt_group_id);
 		if (!res)
@@ -246,9 +246,9 @@ void mnt_release_group_id(struct mount *mnt)
 	int id = mnt->mnt_group_id;
 #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
 	// If mnt->mnt_group_id >= DEFAULT_SUS_MNT_GROUP_ID, it means 'mnt' is also sus mount,
-	// then we free the mnt->mnt_group_id from susfs_mnt_group_ida
-	if (id >= DEFAULT_SUS_MNT_GROUP_ID) {
-		ida_remove(&susfs_mnt_group_ida, id);
+	// then we free the mnt->mnt_group_id from susfs_ksu_mnt_group_ida
+	if (id >= DEFAULT_KSU_MNT_GROUP_ID) {
+		ida_remove(&susfs_ksu_mnt_group_ida, id);
 		if (susfs_mnt_group_start > id)
 			susfs_mnt_group_start = id;
 		mnt->mnt_group_id = 0;
