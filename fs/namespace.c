@@ -1280,15 +1280,10 @@ static struct mount *clone_mnt(struct mount *old, struct dentry *root,
 	int err;
 
 #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
-	// We won't check it anymore if boot-completed stage is triggered.
-	if (susfs_is_boot_completed_triggered) {
-		goto orig_flow;
-	}
 	if (old->mnt_id >= DEFAULT_KSU_MNT_ID || old->mnt_parent->mnt_id >= DEFAULT_KSU_MNT_ID) {
 		mnt = susfs_alloc_sus_vfsmnt(old->mnt_devname);
 		goto bypass_orig_flow;
 	}
-orig_flow:
 #endif
 	mnt = alloc_vfsmnt(old->mnt_devname);
 #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
@@ -1348,7 +1343,7 @@ bypass_orig_flow:
 
 #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
 	// If caller process is zygote and not doing unshare, so we just reorder the mnt_id
-	if (likely(is_current_zygote_domain) && !(flag & CL_ZYGOTE_COPY_MNT_NS)) {
+	if (likely(susfs_is_current_zygote_domain) && !(flag & CL_ZYGOTE_COPY_MNT_NS)) {
 		mnt->mnt.susfs_mnt_id_backup = mnt->mnt_id;
 		mnt->mnt_id = current->susfs_last_fake_mnt_id++;
 	}
