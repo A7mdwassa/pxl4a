@@ -305,6 +305,7 @@ static void drop_mountpoint(struct fs_pin *p)
 	mntput(&m->mnt);
 }
 
+#ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
 static struct mount *susfs_alloc_sus_vfsmnt(const char *name)
 {
 	struct mount *mnt = kmem_cache_zalloc(mnt_cache, GFP_KERNEL);
