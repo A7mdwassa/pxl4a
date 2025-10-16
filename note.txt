@@ -1,0 +1,1 @@
+I built this kernel using llvm 14.0.6 and gcc 4.9 on arch linux
